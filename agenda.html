@@ -20,7 +20,7 @@
 
 <div class="container mt-4">   
 
-    <a id="log" href="/?id=login" > Entrar </a>
+    <a id="log" href="/agenda?id=login" > Entrar </a>
 <br><br>
     
 <div id="logar" >
@@ -351,7 +351,7 @@ console.log(data.toLocaleDateString('pt-br', options));
     <p>Local: <b>${childData.local}</b>, organizador: ${childData.organizador}</p>
     <div>
         
-        <a id="editar" href="/?a=${pegaA}&id=${childKey}&adm=ediding" >
+        <a id="editar" href="/agenda?a=${pegaA}&id=${childKey}&adm=ediding" >
         Editar </a>
 
  
@@ -387,7 +387,7 @@ esconder(editor)
 
 function addiciona(){
 
-    window.location=`/?a=${pegaA}&log=active&adm=add`
+    window.location=`/agenda?a=${pegaA}&log=active&adm=add`
 
     limpaCampos()
     mostrar(editor)
@@ -469,9 +469,9 @@ var username=document.getElementById('usuario').value
 
 var password=document.getElementById('senha').value
 
-if (username=="euques" && password=="1010") { window.location="/?a=euques&log=active"; done=1; }
+if (username=="euques" && password=="1010") { window.location="/agenda?a=euques&log=active"; done=1; }
 
-if (username=="maycon" && password=="1010") { window.location="/?a=maycon&log=active"; done=1; }
+if (username=="maycon" && password=="1010") { window.location="/agenda?a=maycon&log=active"; done=1; }
 
 
 

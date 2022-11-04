@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ler, Escrever, Atualizar, Deletar Informação </title>
+
+   
+
+   
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+  
+</head>
+<body>
+
+
+
+
+<div class="container mt-4">   
+
+    <a id="log" href="/?id=login" > Entrar </a>
+<br><br>
+    
+<div id="logar" >
+
+         
+        <!-- Formulario de Login -->
+        
+        <label for="data" class="form-label">Usuário:</label>
+        <input type="text" class="form-control" id="usuario"  required> <br>
+
+        <label class="form-label">Senha</label> 
+        <input id="senha" class="form-control" type="password" required>  <br>
+
+        <br>
+
+
+
+<button id="login" class="btn btn-primary">Logar</button>
+
+<br><br>
+
+</div>   
+
+<div id="editor" >
+
+         
+            <!-- Formulario edita -->
+            
+            <label for="data" class="form-label">Data inicio:</label>
+            <input type="datetime-local" class="form-control" id="dataInicio" name="dataInicio" required> <br>
+
+            <label class="form-label">Show</label> 
+            <input id="show" class="form-control" type="text" required>  <br>
+
+            <label class="form-label">Local</label> 
+            <input id="local" class="form-control" type="text" required><br>
+
+            <label class="form-label" required >Organizador</label> 
+            <select id="organizador"class="form-select" aria-label="Default select example">
+                <option value="Maycon">Maycon</option>
+                <option value="Euques">Euques</option>
+            </select>
+            <br>
+    
+
+
+<button id="Insbtn" class="btn btn-primary">Inserir</button>
+
+<button id="Updbtn" class="btn btn-primary">Atualizar</button>
+<button id="Delbtn" class="btn btn-primary">Deletar</button>
+<button id="cancelaBtn" class="btn btn-outline-secondary">cancelar</button>
+<br><br>
+
+</div>
+
+
+  
+
+
+
+
+
+    
+
+
+ 
+<ul id="conteudo" class="list-group"></ul>
+<br>
+<button id="adiciona" class="btn btn-primary">Adiconar novo</button>
+<br>
+
+
+<!------------------ INPORTS + CONFIGURATION---------------------------------------->
+
+<script type="module">
+
+//Esconde e conteudo elementos
+
+// conteudo
+function mostrar(element) {
+element.style.display = 'block'
+}
+
+// esconde
+function esconder(element) {
+element.style.display = 'none'
+}
+
+
+
+
+
+const { search } = window.location
+const params = new URLSearchParams(search)
+const pegaA = params.get('a')
+const pegaId = params.get('id')
+const pegaAdm = params.get('adm')
+const pegaLogin = params.get('log')
+
+
+
+
+ 
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyD9w-BMC-4WrQppa6VnOCrszo4QMIyROXU",
+      authDomain: "euques-teste.firebaseapp.com",
+      databaseURL: "https://euques-teste-default-rtdb.firebaseio.com",
+      projectId: "euques-teste",
+      storageBucket: "euques-teste.appspot.com",
+      messagingSenderId: "48182046778",
+      appId: "1:48182046778:web:4cd6f3b08cae7f6588c503",
+      measurementId: "G-KQXMBG1EXG"
+    };
+  
+ 
+    const app = initializeApp(firebaseConfig);
+
+
+
+    
+    import {getDatabase, push, ref, get, set, child, update, remove, onValue, orderByChild, query}
+    from "https://www.gstatic.com/firebasejs/9.9.4/firebase-database.js"
+
+    const db = getDatabase()
+
+//----------------- Referencias---------------------------------------->
+var dataInicio = document.getElementById("dataInicio")
+
+var show = document.getElementById("show")
+var id = document.getElementById("id")
+var local = document.getElementById("local")
+var organizador = document.getElementById("organizador")
+
+var insBtn = document.getElementById("Insbtn")
+var selBtn = document.getElementById("Selbtn")
+var updBtn = document.getElementById("Updbtn")
+var delBtn = document.getElementById("Delbtn")
+
+var conteudo = document.getElementById("conteudo")
+
+var editor = document.getElementById("editor")
+
+var editar = document.querySelectorAll("a#editar") 
+var adiciona = document.getElementById("adiciona") 
+var cancelaBtn = document.getElementById("cancelaBtn")
+
+
+
+
+
+mostrar(editor)
+
+//----------------- Declaracoes---------------------------------------->
+
+function limpaCampos(){
+
+    dataInicio.value = ""
+    show.value=""
+    local.value=""
+
+
+}
+
+
+//----------------- Declaracoes---------------------------------------->
+
+const cliente = "maycon"
+let dia = "01022200"
+
+
+
+
+//---------------------Insert data ---- ------------------
+
+function InsertData(){
+    push(ref(db, `agenda/${cliente}/${pegaA}/` ),{
+        nome: show.value,
+  
+        local: local.value,
+        organizador: organizador.value,
+        inicio: dataInicio.value
+    })
+    .then(()=>{
+        alert("Inserido com sucesso")
+
+        conteudoDados()
+        limpaCampos()
+
+        window.history.back()
+    })
+    .catch((error)=>{
+        alert("Ih Foseu, error"+error)
+    })
+}
+
+
+//--------------------- Selecionar ----------------------
+
+//seleciona pelo endereço
+if (pegaId != null ) {
+
+SelectDada()
+
+
+}
+
+function SelectDada(){
+    const dbref = ref(db)
+    get(child(dbref, `agenda/${cliente}/${pegaA}/` + pegaId)).then((snapshot)=>{
+        if(snapshot.exists()){
+            dataInicio.value = snapshot.val().inicio
+            show.value = snapshot.val().nome
+            local.value = snapshot.val().local
+            organizador.value = snapshot.val().organizador
+
+            
+        }
+
+        else{
+            
+
+            esconder(editor)
+            
+        
+        }
+    })
+    .catch((error)=>{
+        alert("fodeu, error"+error)
+    })
+}   
+
+
+//--------------------- Atualizar ----------------------
+
+
+
+function UpdateDada(){
+    update(ref(db, `agenda/${cliente}/${pegaA}/` + pegaId),{
+
+        local: local.value,
+        organizador: organizador.value,
+        inicio: dataInicio.value,
+        nome: show.value
+    
+    })
+    .then(()=>{
+        alert("Atualizado com sucesso")
+        conteudoDados()
+        limpaCampos()
+
+        esconder(editor)
+
+        liberaEdita()       
+        
+        window.history.back()
+        
+    })
+    .catch((error)=>{
+        alert("Ih Foseu, error"+error)
+    })
+}
+
+//--------------------- Deletar ----------------------
+
+function DeleteDada(){
+    remove(ref(db, `agenda/${cliente}/${pegaA}/` + pegaId))
+    .then(()=>{
+        alert("Removido com Sucesso!")
+        conteudoDados()
+
+        esconder(editor)
+
+        liberaEdita()   
+        window.history.back()
+    })
+    .catch((error)=>{
+        alert("Ih Foseu, error"+error)
+    })
+}
+
+
+//-------------------Atribuição Botões ----------------------
+
+insBtn.addEventListener('click', InsertData,)
+
+updBtn.addEventListener('click', UpdateDada)
+delBtn.addEventListener('click', DeleteDada)
+
+adiciona.addEventListener('click', addiciona)
+
+login.addEventListener('click', Login)
+
+cancelaBtn.addEventListener('click', cancelar)
+
+
+
+//-------------------------conteudo -------------
+
+
+
+function conteudoDados(){
+
+    
+var seleciona = document.getElementById("seleciona")
+
+var duplica = ""
+
+onValue(ref(db, `agenda/${cliente}/${pegaA}/`), (snapshot) => {
+  snapshot.forEach((childSnapshot) => {
+    const childKey = childSnapshot.key;
+    const childData = childSnapshot.val();
+
+    console.log(childData )
+
+    
+// ... trata data
+
+var data = new Date(childData.inicio);
+var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+var dateMin = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
+var optionsH = {  hour: '2-digit', minute: '2-digit' };
+
+console.log(data.toLocaleDateString('pt-br', options));
+
+    duplica = `<li class="list-group-item"><div>${data.toLocaleDateString('pt-br', dateMin)}</div><b> ${childData.nome.toUpperCase()} </b> <br>  ${data.toLocaleDateString('pt-br', options)} > ${data.toLocaleTimeString('pt-br', optionsH)}
+    <p>Local: <b>${childData.local}</b>, organizador: ${childData.organizador}</p>
+    <div>
+        
+        <a id="editar" href="/?a=${pegaA}&id=${childKey}&adm=ediding" >
+        Editar </a>
+
+ 
+        
+        </div></li> 
+    ` + duplica
+
+    conteudo.innerHTML = duplica
+
+   
+    document.querySelectorAll("#editar").forEach(function(el) {
+   el.style.display = "none";
+
+});
+
+  })
+}, {
+  onlyOnce: true
+});
+
+}
+
+
+
+conteudoDados()
+
+esconder(editor)
+
+
+
+//---------------funções dos botões---------------------
+
+
+function addiciona(){
+
+    window.location=`/?a=${pegaA}&log=active&adm=add`
+
+    limpaCampos()
+    mostrar(editor)
+   
+}
+
+
+
+
+function cancelar(){
+
+    window.history.back()
+
+}
+
+
+
+
+
+//mostra login caso o id na url seja igual login
+if (pegaId === "login") {
+
+mostrar(logar)
+esconder(conteudo)
+esconder(adiciona)
+
+
+}else{
+    esconder(logar)
+    
+}
+
+
+
+//editor
+if (pegaAdm === "ediding") {
+
+mostrar(editor)
+esconder(conteudo)
+esconder(insBtn)
+
+
+}
+
+
+//adcionaNovo
+if (pegaAdm === "add") {
+
+mostrar(editor)
+
+esconder(adiciona)
+
+
+}
+
+
+
+function liberaEdita(){
+setTimeout(function () { if (pegaLogin === "active") {
+
+document.querySelectorAll("#editar").forEach(function(el) {
+el.style.display = "block";
+
+})
+
+} }, 1000)
+
+}
+
+
+
+
+//area de login simples
+
+function Login(){
+var done=0;
+
+var username=document.getElementById('usuario').value
+
+var password=document.getElementById('senha').value
+
+if (username=="euques" && password=="1010") { window.location="/?a=euques&log=active"; done=1; }
+
+if (username=="maycon" && password=="1010") { window.location="/?a=maycon&log=active"; done=1; }
+
+
+
+if (done==0) { alert("Senha ou Usuário inválido."); }
+}
+
+
+//o que acontece se alguem logar
+
+if (pegaLogin ==="active"){
+
+
+esconder(insBtn)
+mostrar(insBtn)
+mostrar(adiciona)
+esconder(updBtn)
+esconder(delBtn)
+liberaEdita()
+
+
+}else{
+
+    esconder(adiciona)
+
+}
+
+  </script>
+
+
+</div>
+
+
+</body>
+</html>
